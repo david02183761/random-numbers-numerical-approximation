@@ -1,0 +1,64 @@
+import gcl
+
+#Aproximación usando conteo de puntos (Hit or Miss)
+def metodo1 ( n ) :
+start = time . time ()
+M = np . exp (3/2)
+_ , U = glc (2* n )
+X = [3* u for u in U [0::2]]
+Y = [ M * u for u in U [1::2]]
+
+bajo = sum (1 for i in range ( n ) if Y [ i ] <= np . exp ( X [ i ]/2) )
+I_est = 3 * M * bajo / n
+tiempo = time . time () - start
+
+return I_est , tiempo
+
+I_exacto = 2 * ( np . exp (3/2) - 1)
+print ( f" Valor exacto : { I_exacto :.10 f}\n")
+
+for n in [100 , 1000 , 10000 , 100000]:
+I_est , t = metodo1 ( n )
+error = abs ( I_est - I_exacto )
+print ( f"n={n: >6}: I={ I_est :.6 f} , error ={ error :.6 f} , t={t:.3 f}s")
+
+#Método usando la esperanza
+def metodo2 ( n ) :
+start = time . time ()
+_ , U = glc ( n )
+X = [3* u for u in U ]
+
+suma = sum ( np . exp ( x /2) for x in X )
+I_est = 3 * suma / n
+tiempo = time . time () - start
+
+return I_est , tiempo
+
+print ("\ nMetodo 2:")
+for n in [100 , 1000 , 10000 , 100000]:
+I_est , t = metodo2 ( n )
+error = abs ( I_est - I_exacto )
+print ( f"n={n: >6}: I={ I_est :.6 f} , error ={ error :.6 f} , t={t:.3 f}s")
+
+#Visualización y comparación de la eficiencia en cada método
+lanzamientos = [100 , 500 , 1000 , 5000 , 10000 , 50000 , 100000]
+errores_m1 = []
+errores_m2 = []
+
+for n in lanzamientos :
+I1 , _ = metodo1 ( n )
+I2 , _ = metodo2 ( n )
+errores_m1 . append (abs ( I1 - I_exacto ) )
+errores_m2 . append (abs ( I2 - I_exacto ) )
+
+plt . figure ( figsize =(10 , 6) )
+plt . loglog ( lanzamientos , errores_m1 , ’o-’, label =’Metodo 1’,
+linewidth =2 , markersize =8)
+plt . loglog ( lanzamientos , errores_m2 , ’s-’, label =’Metodo 2’,
+linewidth =2 , markersize =8)
+plt . xlabel (’Numero de lanzamientos (n)’, fontsize =12)
+plt . ylabel (’Error absoluto ’, fontsize =12)
+plt . title (’ Convergencia : Metodo 1 vs Metodo 2’, fontsize =14)
+plt . legend ( fontsize =11)
+plt . grid ( True , alpha =0.3 , which =’both ’)
+plt . show ()
